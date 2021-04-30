@@ -10,7 +10,7 @@ export const RemotionVideo: React.FC = () => {
 			<Composition
 				id="LearnDataFetch"
 				component={LearnDataFetch}
-				durationInFrames={12540}
+				durationInFrames={400 * 30}
 				fps={30}
 				width={1920}
 				height={1080}

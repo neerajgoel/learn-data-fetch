@@ -1,14 +1,15 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { continueRender, delayRender, useCurrentFrame } from "remotion";
+import { InnerContainer } from "./InnerContainer";
 // import styled from "styled-components";
 import { SingleMessageApiResponse } from "./Messages";
 
 
 export function getIndexedArray(d: string) {
-  console.log("get indexed array : " +  d);
+  // console.log("get indexed array : " +  d);
   let myJSON = JSON.parse(d);
   if (myJSON != null) {
-    let size = myJSON.data.metaData.frames;
+    let size = myJSON.metaData.frames;
     var x = [];
     for (let i = 0; i < size; i++) {
       x.push(i);
@@ -28,9 +29,9 @@ export function getIndexedArrayNum(size: number) {
 
 
 export function getTime(d: string, frameIndex: number) {
-  console.log("");
-  console.log("frameIndex : " + frameIndex);
-  console.log("data: " + d);
+  // console.log("");
+  // console.log("frameIndex : " + frameIndex);
+  // console.log("data: " + d);
   let myJSON = JSON.parse(d);
   if (myJSON != null) {
     for (let i = 0; i < myJSON.frames.length; i++) {
@@ -44,8 +45,8 @@ export function getTime(d: string, frameIndex: number) {
 }
 
 export function getIndex(d: string) {
-  console.log("");
-  console.log("data: " + d);
+  // console.log("");
+  // console.log("data: " + d);
   let myJSON = JSON.parse(d);
   if (myJSON != null) {
     return myJSON.index;
@@ -54,8 +55,8 @@ export function getIndex(d: string) {
 
 
 export function getmsg(msgs: String[], fi: number) {
-  console.log("");
-  console.log("messages: " + msgs[fi]);
+  // console.log("");
+  // console.log("messages: " + msgs[fi]);
   return msgs[fi];
 }
 
@@ -70,11 +71,11 @@ export const LearnDataFetch: React.FC<{
 
   const [metadata, setMetaData] = useState(null);
   const [handle] = useState(() => delayRender());
-  const [messages, setMessages] = useState<null | String[]>( null );
+  const [messages, setMessages] = useState<null | string[]>( null );
 
   const fetchMessages = useCallback(async () => {
 
-    const response2 = await fetch("http://localhost:8080/corona_number_data_1?ver=long&dt=metadata");
+    const response2 = await fetch("http://localhost:8080/test?dt=metadata");
     const json2 = await response2.json();
     setMetaData(json2);
 
@@ -83,10 +84,9 @@ export const LearnDataFetch: React.FC<{
     const messages = await Promise.all(
       idsArrLocal.map(async (m) => {
         const response = await fetch(
-          `http://localhost:8080/corona_number_data_1?ver=long&dt=data&fi=${m}`
+          `http://localhost:8080/test?dt=data&fi=${m}`
         );
         const json = await response.json();
-        console.log(json);
         return JSON.stringify(json);
       })
     );
@@ -101,7 +101,7 @@ export const LearnDataFetch: React.FC<{
 
   let idsArr = getIndexedArray(JSON.stringify(metadata));
   const frame = useCurrentFrame();
-  let frameIndex = calcFrameIndex(frame);
+  const frameIndex = calcFrameIndex(frame);
 
   return(
     <div style={{
@@ -112,16 +112,17 @@ export const LearnDataFetch: React.FC<{
       opacity: 1
     }}>
       <h1>Ids size : { idsArr == null ? "null" : idsArr.length }</h1>
-      {/* {
-        idsArr.map( (index) => (
-          <h2>index : {index}</h2>
+      {
+        idsArr.map( (key, index) => (
+          <InnerContainer 
+            key={key} 
+            d={messages == null ? "null" : messages[frameIndex]}
+            metadata = {metadata == null ? "null" : metadata}
+            frameIndex = {frameIndex} />
         ))
-      } */}
+      }
       <h1>Frame Index : {frameIndex}</h1>
       <h1>Size of messages: { messages == null ? "null" : messages.length }</h1>
-      {/* <h1>Time : { messages == null ? "null" : getTime( JSON.stringify(messages[frameIndex]), frameIndex ) }</h1> */}
-      {/* <h1>Time : {messages == null ? "null" : getIndex(JSON.stringify(messages[frameIndex]))}</h1> */}
-      <h1>Time : {messages == null ? "null" : getmsg(messages, frameIndex) }</h1>
     </div>
   )
 
