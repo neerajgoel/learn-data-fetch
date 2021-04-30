@@ -92,12 +92,17 @@ export const LearnDataFetch: React.FC<{
     );
     setMessages(messages);
 
-    continueRender(handle);
-  }, [handle]);
-
+  }, []);
+  
   useEffect(() => {
     fetchMessages();
   }, [fetchMessages, handle]);
+  
+  useEffect(() => {
+    if (messages !== null) {
+      continueRender(handle);
+    }
+  }, [handle, messages])
 
   let idsArr = getIndexedArray(JSON.stringify(metadata));
   const frame = useCurrentFrame();
